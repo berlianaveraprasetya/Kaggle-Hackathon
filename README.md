@@ -1,1 +1,1 @@
-# Kaggle-Hackathon
+# Kaggle-Mini Hackathon Polstat STIS
