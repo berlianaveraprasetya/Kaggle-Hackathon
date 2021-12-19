@@ -1,0 +1,66 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+setwd("C:/Users/Asus/Downloads/hackathon")
+
+#MEMANGGIL DATA
+data.train<-read.csv(file = "Train.csv", header= TRUE)
+tail(data.train)
+
+data.test<-read.csv(file = "Test.csv", header= TRUE)
+str(data.test)
+
+median(data.train$Z4)
+median(data.train$Z4, na.rm=TRUE)
+median(data.train$Z4, na.rm=TRUE)
+
+data.train$IsTrainSet <- TRUE
+tail(data.train$IsTrainSet)
+
+data.test$IsTrainSet <- FALSE
+
+ncol(data.train)
+ncol(data.test)
+
+names(data.train)
+names(data.test)
+
+#MENAMBAH KOLOM
+data.test$Y <- NA
+ncol(data.test)
+names(data.test)
+
+#MENAGGABUNGKAN DATA
+data.full <- rbind(data.train, data.test)
+tail(data.full)
+table(data.full$IsTrainSet)
+
+#cek missing value
+z4.median <- median(data.full$Z4, na.rm = TRUE)
+data.full[is.na(data.full$Z4),"Z4"] <- z4.median
+
+#SPLIT DATA
+data.train<-data.full[data.full$IsTrainSet==TRUE,]
+data.test<-data.full[data.full$IsTrainSet==FALSE,]
+
+data.train$Y <- as.factor(data.train$Y)
+
+y.equation <- "Y ~ X1 + X2 + X3 + X4 + X5 + X6 +Z1 +Z2 +Z3 +Z4"
+y.formula <- as.formula(y.equation)
+
+library(randomForest)
+
+data.model <- randomForest(formula = y.formula, data= data.train, ntree = 500, mtry = 3, nodesize = 0.01 * nrow(data.test))
+
+features.equation <- "X1 + X2 + X3 + X4 + X5 + X6 +Z1 +Z2 +Z3 +Z4"
+Y <- predict(data.model, newdata = data.test)
+
+ID <- data.test$ï..ID
+
+output.df <- as.data.frame(ID)
+output.df$Y <- Y
+head(output.df)
+
+#write.csv(output.df, file="Solution Sample.csv", row.names= FALSE)
